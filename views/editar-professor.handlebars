@@ -1,0 +1,87 @@
+<div class="admin-dashboard">
+  <section class="admin-hero">
+    <p class="eyebrow">Portal do Admin</p>
+    <h1 class="main-title">Editar Professor</h1>
+    <p>Atualize os dados do professor e as turmas que ele ministra.</p>
+  </section>
+
+  {{#if mensagem}}
+    <div class="notice-alert">{{mensagem}}</div>
+  {{/if}}
+
+  <section class="admin-first-access">
+    <form class="admin-form-card" method="POST" action="/admin/professores/{{professor._id}}">
+      <div class="form-header">
+        <span class="form-icon">PR</span>
+        <div>
+          <p class="eyebrow">Matricula {{professor.matricula}}</p>
+          <h2>{{professor.nome}}</h2>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Nome</label>
+          <input type="text" name="nome" value="{{professor.nome}}" required>
+        </div>
+
+        <div class="input-group">
+          <label>E-mail</label>
+          <input type="email" name="email" value="{{professor.email}}" required>
+        </div>
+
+        <div class="input-group full-line">
+          <label>Turmas que ministra</label>
+          <div class="choice-list">
+            {{#each turmas}}
+              <label class="check option-check">
+                <input type="checkbox" name="turmas" value="{{_id}}" {{#if selecionada}}checked{{/if}}>
+                <span>{{nome}} | {{curso.nome}}</span>
+              </label>
+            {{else}}
+              <p class="hint-text">Nenhuma turma cadastrada.</p>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">Salvar Alteracoes</button>
+      <a href="/admin" class="button-link secondary edit-back">Voltar</a>
+    </form>
+
+    <form id="deleteForm" class="delete-form" method="POST" action="/admin/professores/{{professor._id}}/excluir">
+      <button type="submit" class="btn-danger">Excluir Professor</button>
+    </form>
+  </section>
+</div>
+
+<div id="confirmModal" class="confirm-modal" hidden>
+  <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle">Excluir professor?</h2>
+    <p>Esta acao apaga o professor, o acesso e remove seus vinculos com turmas.</p>
+    <div class="confirm-actions">
+      <button type="button" class="button-link secondary" data-confirm-cancel>Cancelar</button>
+      <button type="button" class="btn-danger" data-confirm-ok>Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const deleteForm = document.getElementById('deleteForm')
+  const confirmModal = document.getElementById('confirmModal')
+
+  if (deleteForm && confirmModal) {
+    deleteForm.addEventListener('submit', (event) => {
+      event.preventDefault()
+      confirmModal.hidden = false
+    })
+
+    confirmModal.querySelector('[data-confirm-cancel]').addEventListener('click', () => {
+      confirmModal.hidden = true
+    })
+
+    confirmModal.querySelector('[data-confirm-ok]').addEventListener('click', () => {
+      deleteForm.submit()
+    })
+  }
+</script>

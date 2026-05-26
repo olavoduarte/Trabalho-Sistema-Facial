@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}} | Viu Liberou</title>
+  <style>
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      background: #07101d;
+      color: #eef6ff;
+    }
+
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 50% -10%, rgba(72, 146, 240, 0.28), transparent 34%),
+        linear-gradient(135deg, #07101d 0%, #111c31 48%, #081322 100%);
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="/portal.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand brand-text" href="/portal">Viu <span>Liberou</span></a>
+    <nav>
+      <a href="/portal">Portal</a>
+      <a href="/">Captura</a>
+      {{#if auth}}
+        <a href="/logout">Sair</a>
+      {{else}}
+        <a href="/admin">Admin</a>
+        <a href="/professor">Professor</a>
+        <a href="/aluno">Aluno</a>
+      {{/if}}
+    </nav>
+  </header>
+
+  <main class="page">
+    {{{body}}}
+  </main>
+  <script>
+    const scrollKey = 'viuLiberouScrollY'
+
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+
+    function salvarPosicaoScroll() {
+      sessionStorage.setItem(scrollKey, String(window.scrollY || 0))
+    }
+
+    function restaurarPosicaoScroll() {
+      const scrollY = sessionStorage.getItem(scrollKey)
+
+      if (scrollY === null) return
+      sessionStorage.removeItem(scrollKey)
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: Number(scrollY) || 0,
+            left: 0,
+            behavior: 'auto'
+          })
+        })
+      })
+    }
+
+    document.addEventListener('submit', (event) => {
+      const form = event.target
+
+      if (form.matches('form[method="GET"], form[method="get"], .filters, .record-search')) {
+        salvarPosicaoScroll()
+      }
+    })
+
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('.pagination a, .record-search a, .filters a')
+
+      if (link) {
+        salvarPosicaoScroll()
+      }
+    })
+
+    restaurarPosicaoScroll()
+  </script>
+</body>
+</html>

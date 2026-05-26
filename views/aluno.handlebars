@@ -1,0 +1,197 @@
+<div class="student-dashboard">
+  {{#if aluno}}
+    <section class="student-hero">
+      <div>
+        <p class="eyebrow">Portal do Aluno</p>
+        <h1>Ola, {{saudacaoNome}} 👋</h1>
+        <p>Consulta de Presenca</p>
+      </div>
+    </section>
+
+    <section class="student-metrics">
+      <article class="student-card identity-card">
+        <div class="student-avatar">{{iniciaisAluno}}</div>
+        <div>
+          <span>Aluno</span>
+          <strong>{{aluno.nome}}</strong>
+          <small>RA {{aluno.ra}}</small>
+        </div>
+      </article>
+
+      <article class="student-card presence-card">
+        <span class="metric-icon">✓</span>
+        <span>Presencas</span>
+        <strong class="count-up" data-count="{{presencas.length}}">0</strong>
+      </article>
+
+      <article class="student-card absence-card {{faltaClasse}}">
+        <span class="metric-icon">!</span>
+        <span>Faltas estimadas</span>
+        <strong class="count-up" data-count="{{faltas}}">0</strong>
+      </article>
+    </section>
+
+    <section class="frequency-card">
+      <div>
+        <span>Frequencia geral</span>
+        <strong class="count-up" data-count="{{frequenciaPercent}}">0</strong><strong>% de presenca</strong>
+      </div>
+      <div class="frequency-track" aria-label="{{frequenciaPercent}}% de presenca">
+        <span style="width: {{frequenciaPercent}}%;"></span>
+      </div>
+    </section>
+
+    <section class="student-section academic-section">
+      <div class="section-heading">
+        <p class="eyebrow">Dados Academicos</p>
+        <h2>Seu vinculo escolar</h2>
+      </div>
+
+      <div class="academic-grid">
+        <div class="academic-chip chip-blue">
+          <span>📘</span>
+          <div>
+            <small>Curso</small>
+            <strong>{{aluno.curso.nome}}</strong>
+          </div>
+        </div>
+
+        <div class="academic-chip chip-purple">
+          <span>👥</span>
+          <div>
+            <small>Turma</small>
+            <strong>{{aluno.turma.nome}}</strong>
+          </div>
+        </div>
+
+        <div class="academic-chip {{#if aluno.facialCadastrada}}chip-green{{else}}chip-orange{{/if}}">
+          <span>📷</span>
+          <div>
+            <small>Facial</small>
+            <strong>{{#if aluno.facialCadastrada}}Ativo{{else}}Pendente{{/if}}</strong>
+          </div>
+        </div>
+
+        <div class="academic-chip chip-slate">
+          <span>#</span>
+          <div>
+            <small>RA</small>
+            <strong>{{aluno.ra}}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="student-section history-section" id="historico-aluno">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Historico</p>
+          <h2>Presencas registradas</h2>
+        </div>
+        {{#if historicoPaginacao}}
+          <p class="list-count">{{historicoPaginacao.inicio}}-{{historicoPaginacao.fim}} de {{historicoPaginacao.total}} registros</p>
+        {{/if}}
+      </div>
+
+      <div class="heatmap-card">
+        <div class="heatmap-title">
+          <span>Mapa semanal</span>
+          <small>Dias com presenca ficam acesos</small>
+        </div>
+        <div class="heatmap-grid">
+          {{#each heatmap}}
+            <div class="heatmap-day {{#if ativo}}active{{/if}}" title="{{data}}">
+              <span></span>
+              <small>{{label}}</small>
+            </div>
+          {{/each}}
+        </div>
+      </div>
+
+      <div class="student-table-wrap limited-table">
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Horario</th>
+              <th>Origem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each historicoPresencas}}
+              <tr>
+                <td>
+                  <span class="weekday-badge">{{diaSemana}}</span>
+                  {{data}}
+                </td>
+                <td>{{horario}}</td>
+                <td><span class="origin-chip {{origemClasse}}">{{origemLabel}}</span></td>
+              </tr>
+            {{else}}
+              <tr>
+                <td colspan="3">
+                  <div class="empty-presence">
+                    <svg viewBox="0 0 120 90" role="img" aria-label="Calendario vazio">
+                      <rect x="20" y="18" width="80" height="58" rx="10"></rect>
+                      <path d="M20 34h80"></path>
+                      <circle cx="44" cy="52" r="4"></circle>
+                      <circle cx="60" cy="52" r="4"></circle>
+                      <circle cx="76" cy="52" r="4"></circle>
+                    </svg>
+                    <strong>Nenhuma presenca ainda - que tal aparecer? 😄</strong>
+                  </div>
+                </td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+      {{#if historicoPaginacao}}
+        <nav class="pagination" aria-label="Paginas do historico do aluno">
+          {{#if historicoPaginacao.temAnterior}}
+            <a class="page-link" href="{{historicoPaginacao.anteriorUrl}}">Anterior</a>
+          {{else}}
+            <span class="page-link disabled">Anterior</span>
+          {{/if}}
+          {{#each historicoPaginacao.paginas}}
+            {{#if ativa}}
+              <span class="page-link active">{{numero}}</span>
+            {{else}}
+              <a class="page-link" href="{{url}}">{{numero}}</a>
+            {{/if}}
+          {{/each}}
+          {{#if historicoPaginacao.temProxima}}
+            <a class="page-link" href="{{historicoPaginacao.proximaUrl}}">Proxima</a>
+          {{else}}
+            <span class="page-link disabled">Proxima</span>
+          {{/if}}
+        </nav>
+      {{/if}}
+    </section>
+  {{else}}
+    <section class="student-section">
+      <h1>Aluno nao encontrado</h1>
+      <p>Nao encontramos um aluno vinculado a este usuario.</p>
+    </section>
+  {{/if}}
+</div>
+
+<script>
+  document.querySelectorAll('.count-up').forEach((element) => {
+    const target = Number(element.dataset.count || 0)
+    const duration = 700
+    const start = performance.now()
+
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1)
+      const value = Math.round(target * progress)
+      element.textContent = value
+
+      if (progress < 1) {
+        requestAnimationFrame(tick)
+      }
+    }
+
+    requestAnimationFrame(tick)
+  })
+</script>

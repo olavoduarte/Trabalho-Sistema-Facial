@@ -1,0 +1,248 @@
+<div class="portal-dashboard">
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">{{turma.curso.nome}}</p>
+    <h1>{{turma.nome}}</h1>
+    <p>Periodo: {{turma.periodo}}</p>
+  </div>
+</section>
+
+{{#if mensagem}}
+  <div class="feedback-card {{tipoMensagem}}">
+    <strong>{{#if (eq tipoMensagem "error")}}Aviso{{else}}Confirmacao{{/if}}</strong>
+    <p>{{mensagem}}</p>
+  </div>
+{{/if}}
+
+<section class="panel" id="lista-presenca">
+  <div class="panel-heading-inline">
+    <div>
+      <h2>Lista de presenca | {{dataChamadaLabel}}</h2>
+      <p class="list-count">{{listaPaginacao.inicio}}-{{listaPaginacao.fim}} de {{listaPaginacao.total}} alunos</p>
+    </div>
+    <form class="filters compact-filter" method="GET" action="/professor/turmas/{{turma._id}}">
+      <input type="hidden" name="dataInicio" value="{{dataInicio}}">
+      <input type="hidden" name="dataFim" value="{{dataFim}}">
+      <input type="hidden" name="buscaAluno" value="{{buscaAluno}}">
+      <label>Data da lista
+        <input type="date" name="dataChamada" value="{{dataChamada}}" max="{{hojeInput}}">
+      </label>
+      <button type="submit">Filtrar lista</button>
+    </form>
+  </div>
+  <form class="record-search portal-search" method="GET" action="/professor/turmas/{{turma._id}}">
+    <input type="hidden" name="dataChamada" value="{{dataChamada}}">
+    <input type="hidden" name="dataInicio" value="{{dataInicio}}">
+    <input type="hidden" name="dataFim" value="{{dataFim}}">
+    <input type="search" name="buscaAluno" value="{{buscaAluno}}" placeholder="Buscar por aluno, RA, curso ou turma">
+    <button type="submit">Pesquisar</button>
+    {{#if buscaAluno}}
+      <a class="button-link secondary" href="/professor/turmas/{{turma._id}}?dataChamada={{dataChamada}}&dataInicio={{dataInicio}}&dataFim={{dataFim}}">Limpar</a>
+    {{/if}}
+  </form>
+  <div class="table-wrap limited-table">
+    <table>
+      <thead>
+        <tr>
+          <th>RA</th>
+          <th>Aluno</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Horario</th>
+          <th>Editar</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each lista}}
+          <tr>
+            <td>{{ra}}</td>
+            <td>{{nome}}</td>
+            <td>
+              {{#if presente}}
+                <span class="status-tag success">Presente</span>
+                {{#if presencaFacial}}
+                  <span class="status-tag facial">Facial</span>
+                {{else}}
+                  <span class="status-tag manual">Manual</span>
+                {{/if}}
+              {{else}}
+                <span class="status-tag pending">Falta</span>
+              {{/if}}
+            </td>
+            <td>{{dataPresenca}}</td>
+            <td>{{horario}}</td>
+            <td>
+              <button
+                type="button"
+                class="small-link"
+                data-presence-open
+                data-aluno-id="{{_id}}"
+                data-aluno-nome="{{nome}}"
+                data-origem="{{origem}}"
+                data-presente="{{#if presente}}presente{{else}}falta{{/if}}">
+                Editar
+              </button>
+            </td>
+          </tr>
+        {{else}}
+          <tr>
+            <td colspan="6">Nenhum aluno nesta turma.</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  <nav class="pagination" aria-label="Paginas da lista de presenca">
+    {{#if listaPaginacao.temAnterior}}
+      <a class="page-link" href="{{listaPaginacao.anteriorUrl}}">Anterior</a>
+    {{else}}
+      <span class="page-link disabled">Anterior</span>
+    {{/if}}
+    {{#each listaPaginacao.paginas}}
+      {{#if ativa}}
+        <span class="page-link active">{{numero}}</span>
+      {{else}}
+        <a class="page-link" href="{{url}}">{{numero}}</a>
+      {{/if}}
+    {{/each}}
+    {{#if listaPaginacao.temProxima}}
+      <a class="page-link" href="{{listaPaginacao.proximaUrl}}">Proxima</a>
+    {{else}}
+      <span class="page-link disabled">Proxima</span>
+    {{/if}}
+  </nav>
+</section>
+
+<section class="panel" id="historico-presenca">
+  <div class="panel-heading-inline">
+    <div>
+      <h2>Historico da turma | {{data}}</h2>
+      <p class="list-count">{{historicoPaginacao.inicio}}-{{historicoPaginacao.fim}} de {{historicoPaginacao.total}} registros</p>
+    </div>
+    <form class="filters compact-filter" method="GET" action="/professor/turmas/{{turma._id}}">
+      <input type="hidden" name="dataChamada" value="{{dataChamada}}">
+      <input type="hidden" name="buscaAluno" value="{{buscaAluno}}">
+      <label>Historico de
+        <input type="date" name="dataInicio" value="{{dataInicio}}" max="{{hojeInput}}">
+      </label>
+      <label>Historico ate
+        <input type="date" name="dataFim" value="{{dataFim}}" max="{{hojeInput}}">
+      </label>
+      <button type="submit">Filtrar historico</button>
+    </form>
+  </div>
+  <div class="table-wrap limited-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Horario</th>
+          <th>Aluno</th>
+          <th>Origem</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each historico}}
+          <tr>
+            <td>{{data}}</td>
+            <td>{{horario}}</td>
+            <td>{{aluno}}</td>
+            <td>{{origem}}</td>
+          </tr>
+        {{else}}
+          <tr>
+            <td colspan="4">Nenhuma presenca registrada neste periodo.</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  <nav class="pagination" aria-label="Paginas do historico">
+    {{#if historicoPaginacao.temAnterior}}
+      <a class="page-link" href="{{historicoPaginacao.anteriorUrl}}">Anterior</a>
+    {{else}}
+      <span class="page-link disabled">Anterior</span>
+    {{/if}}
+    {{#each historicoPaginacao.paginas}}
+      {{#if ativa}}
+        <span class="page-link active">{{numero}}</span>
+      {{else}}
+        <a class="page-link" href="{{url}}">{{numero}}</a>
+      {{/if}}
+    {{/each}}
+    {{#if historicoPaginacao.temProxima}}
+      <a class="page-link" href="{{historicoPaginacao.proximaUrl}}">Proxima</a>
+    {{else}}
+      <span class="page-link disabled">Proxima</span>
+    {{/if}}
+  </nav>
+</section>
+
+<div class="page-actions">
+  <a class="button-link secondary" href="/professor">Voltar</a>
+</div>
+</div>
+
+<div id="presenceModal" class="confirm-modal" hidden>
+  <form class="confirm-card presence-edit-card" method="POST" action="/professor/presencas">
+    <h2>Editar presenca</h2>
+    <p id="presenceStudentName"></p>
+    <input type="hidden" name="turmaId" value="{{turma._id}}">
+    <input type="hidden" id="presenceAlunoId" name="alunoId">
+    <input type="hidden" name="data" value="{{dataChamada}}">
+    <input type="hidden" name="dataChamada" value="{{dataChamada}}">
+    <input type="hidden" name="dataInicio" value="{{dataInicio}}">
+    <input type="hidden" name="dataFim" value="{{dataFim}}">
+    <input type="hidden" name="buscaAluno" value="{{buscaAluno}}">
+    <p class="presence-date-field">Data da chamada: <strong>{{dataChamadaLabel}}</strong></p>
+    <div id="presenceLockedWarning" class="feedback-card warning compact-message" hidden>
+      <strong>Presenca facial bloqueada</strong>
+      <p>Nao e possivel aplicar falta ou alterar uma presenca registrada por facial.</p>
+    </div>
+
+    <div class="presence-options">
+      <label class="check option-check">
+        <input type="radio" name="status" value="presente" required>
+        <span>Presenca</span>
+      </label>
+      <label class="check option-check">
+        <input type="radio" name="status" value="falta" required>
+        <span>Falta</span>
+      </label>
+    </div>
+
+    <div class="confirm-actions">
+      <button type="button" class="button-link secondary" data-presence-cancel>Cancelar</button>
+      <button type="submit" class="btn-primary no-margin" data-presence-save>Salvar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const presenceModal = document.getElementById('presenceModal')
+  const presenceAlunoId = document.getElementById('presenceAlunoId')
+  const presenceStudentName = document.getElementById('presenceStudentName')
+  const presenceLockedWarning = document.getElementById('presenceLockedWarning')
+  const presenceSaveButton = presenceModal.querySelector('[data-presence-save]')
+  const presenceStatusInputs = presenceModal.querySelectorAll('input[name="status"]')
+
+  document.querySelectorAll('[data-presence-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const facialBloqueada = button.dataset.origem === 'facial'
+
+      presenceAlunoId.value = button.dataset.alunoId
+      presenceStudentName.textContent = button.dataset.alunoNome
+      presenceModal.querySelector(`input[name="status"][value="${button.dataset.presente}"]`).checked = true
+      presenceLockedWarning.hidden = !facialBloqueada
+      presenceSaveButton.disabled = facialBloqueada
+      presenceStatusInputs.forEach((input) => {
+        input.disabled = facialBloqueada
+      })
+      presenceModal.hidden = false
+    })
+  })
+
+  presenceModal.querySelector('[data-presence-cancel]').addEventListener('click', () => {
+    presenceModal.hidden = true
+  })
+</script>

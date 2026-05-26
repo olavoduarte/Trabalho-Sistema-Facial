@@ -1,0 +1,47 @@
+<section class="login-screen">
+  {{#if erro}}
+    <div class="login-error-modal" role="alert">
+      <span class="login-error-icon">X</span>
+      <strong>Erro no login</strong>
+      <p>{{erro}}</p>
+    </div>
+  {{/if}}
+
+  <a class="login-brand" href="/portal">
+    <strong>Viu <span>Liberou</span></strong>
+  </a>
+
+  <form class="login-panel" method="POST" action="/login/{{perfil}}">
+    <p class="eyebrow">Acesso {{perfilNome}}</p>
+    <h1>Entrar no portal</h1>
+
+    {{#if (eq perfil "aluno")}}
+      <label>
+        RA
+        <input type="text" name="usuario" placeholder="Digite seu RA" autocomplete="username" required>
+      </label>
+    {{/if}}
+
+    {{#if (eq perfil "professor")}}
+      <label>
+        E-mail
+        <input type="email" name="email" placeholder="Digite seu e-mail cadastrado" autocomplete="email" required>
+      </label>
+    {{/if}}
+
+    {{#if (eq perfil "admin")}}
+      <label>
+        Usuario
+        <input type="text" name="usuario" placeholder="Digite seu usuario" autocomplete="username" required>
+      </label>
+    {{/if}}
+
+    <label>
+      Senha
+      <input type="password" name="senha" placeholder="Digite sua senha" autocomplete="current-password" required>
+    </label>
+
+    <button type="submit">Acessar</button>
+    <a class="small-link login-back" href="/portal">Voltar</a>
+  </form>
+</section>

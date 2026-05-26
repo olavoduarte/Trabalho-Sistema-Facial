@@ -1,0 +1,35 @@
+<div class="portal-dashboard">
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Portal do Professor</p>
+    <h1>Minhas turmas</h1>
+    {{#if professor}}
+      <p>{{professor.nome}}</p>
+    {{/if}}
+  </div>
+</section>
+
+{{#if professor}}
+  <section class="panel">
+    <h2>Dados do professor</h2>
+    <p>Nome: {{professor.nome}}</p>
+    <p>E-mail: {{professor.email}}</p>
+    <p>Matrícula: {{professor.matricula}}</p>
+  </section>
+{{/if}}
+
+<section class="grid two professor-turma-grid">
+  {{#each turmas}}
+    <article class="panel">
+      <p class="eyebrow">{{curso.nome}}</p>
+      <h2>{{nome}}</h2>
+      <p>Período: {{periodo}}</p>
+      <a class="button-link" href="/professor/turmas/{{_id}}">Abrir lista de presença</a>
+    </article>
+  {{else}}
+    <div class="panel">
+      <p>Nenhuma turma vinculada ao seu usuario. Cadastre uma turma no painel do administrador e selecione este professor.</p>
+    </div>
+  {{/each}}
+</section>
+</div>

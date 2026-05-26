@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro Facial | Presença Facial</title>
+  <link rel="stylesheet" href="/portal.css">
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<body>
+  <section class="face-register">
+    <a class="camera-brand" href="/portal">Viu <span>Liberou</span></a>
+    <video id="video" autoplay muted playsinline></video>
+
+    <div id="status" class="face-status waiting">
+      <span id="statusLabel">Aproxime seu rosto</span>
+      <strong id="statusDetail">{{aluno.nome}} | RA {{aluno.ra}}</strong>
+    </div>
+
+    <div class="face-actions">
+      <a href="/admin" class="button-link secondary">Voltar ao admin</a>
+      <button id="capturar" type="button">Cadastrar facial</button>
+    </div>
+  </section>
+
+  <script>
+    const alunoId = '{{aluno._id}}'
+    const video = document.getElementById('video')
+    const botao = document.getElementById('capturar')
+    const statusPainel = document.getElementById('status')
+    const statusLabel = document.getElementById('statusLabel')
+    const statusDetail = document.getElementById('statusDetail')
+
+    function atualizarStatus(tipo, label, detail = '') {
+      statusPainel.className = `face-status ${tipo}`
+      statusLabel.textContent = label
+      statusDetail.textContent = detail
+    }
+
+    async function carregarModelos() {
+      atualizarStatus('loading', 'Aproxime seu rosto', 'Carregando reconhecimento facial...')
+      await faceapi.nets.tinyFaceDetector.loadFromUri('/models')
+      await faceapi.nets.faceLandmark68Net.loadFromUri('/models')
+      await faceapi.nets.faceRecognitionNet.loadFromUri('/models')
+    }
+
+    async function iniciarCamera() {
+      atualizarStatus('loading', 'Aproxime seu rosto', 'Abrindo câmera...')
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      })
+
+      video.srcObject = stream
+
+      await new Promise((resolve) => {
+        video.onloadedmetadata = () => resolve()
+      })
+
+      atualizarStatus('waiting', 'Aproxime seu rosto', 'Centralize o rosto e clique em cadastrar')
+    }
+
+    async function capturarDescriptor() {
+      const deteccao = await faceapi
+        .detectSingleFace(
+          video,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 224,
+            scoreThreshold: 0.5
+          })
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor()
+
+      return deteccao ? Array.from(deteccao.descriptor) : null
+    }
+
+    botao.addEventListener('click', async () => {
+      botao.disabled = true
+      atualizarStatus('identifying', 'Identificando facial', 'Capturando os dados do rosto...')
+
+      try {
+        const descriptor = await capturarDescriptor()
+
+        if (!descriptor) {
+          atualizarStatus('error', 'Erro no cadastro', 'Nenhum rosto foi detectado')
+          botao.disabled = false
+          return
+        }
+
+        const resposta = await fetch(`/api/alunos/${alunoId}/facial`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ descriptor })
+        })
+
+        const dados = await resposta.json()
+
+        if (dados.success) {
+          atualizarStatus('success', 'Facial cadastrada', 'O aluno já pode usar a presença facial')
+          setTimeout(() => {
+            window.location.href = '/admin?mensagem=Facial cadastrada com sucesso'
+          }, 1800)
+          return
+        }
+
+        atualizarStatus('error', 'Erro no cadastro', dados.mensagem || 'Não foi possível cadastrar')
+        botao.disabled = false
+      } catch (erro) {
+        console.log(erro)
+        atualizarStatus('error', 'Erro no cadastro', 'Verifique a câmera e tente novamente')
+        botao.disabled = false
+      }
+    })
+
+    async function iniciar() {
+      try {
+        await carregarModelos()
+        await iniciarCamera()
+      } catch (erro) {
+        console.log(erro)
+        atualizarStatus('error', 'Erro ao iniciar', 'Verifique a câmera e recarregue a página')
+      }
+    }
+
+    iniciar()
+  </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<div class="admin-dashboard">
+  <section class="admin-hero">
+    <p class="eyebrow">Portal do Admin</p>
+    <h1 class="main-title">Editar Aluno</h1>
+    <p>Atualize os dados academicos e mantenha a turma vinculada ao curso correto.</p>
+  </section>
+
+  {{#if mensagem}}
+    <div class="notice-alert">{{mensagem}}</div>
+  {{/if}}
+
+  <section class="admin-first-access">
+    <form class="admin-form-card" method="POST" action="/admin/alunos/{{aluno._id}}">
+      <div class="form-header">
+        <span class="form-icon">AL</span>
+        <div>
+          <p class="eyebrow">RA {{aluno.ra}}</p>
+          <h2>{{aluno.nome}}</h2>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Nome Completo</label>
+          <input type="text" name="nome" value="{{aluno.nome}}" required>
+        </div>
+
+        <div class="input-group">
+          <label>E-mail</label>
+          <input type="email" name="email" value="{{aluno.email}}" required>
+        </div>
+
+        <div class="input-group">
+          <label>Telefone</label>
+          <input class="phone-mask" type="tel" name="telefone" value="{{aluno.telefone}}" maxlength="15" pattern="^\(\d{2}\)\s\d{4,5}-\d{4}$" inputmode="numeric">
+        </div>
+
+        <div class="input-group">
+          <label>Curso</label>
+          <select name="curso" id="alunoCurso" required>
+            <option value="" disabled>Selecione o curso</option>
+            {{#each cursos}}
+              <option value="{{_id}}" {{#if selecionado}}selected{{/if}}>{{nome}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Turma</label>
+          <select name="turma" id="alunoTurma" required>
+            <option value="" disabled>Selecione a turma</option>
+            {{#each turmas}}
+              <option value="{{_id}}" data-curso="{{curso._id}}" {{#if selecionada}}selected{{/if}}>{{nome}} | {{curso.nome}}</option>
+            {{/each}}
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">Salvar Alteracoes</button>
+      <a href="/admin" class="button-link secondary edit-back">Voltar</a>
+    </form>
+
+    <form id="deleteForm" class="delete-form" method="POST" action="/admin/alunos/{{aluno._id}}/excluir">
+      <button type="submit" class="btn-danger">Excluir Aluno</button>
+    </form>
+  </section>
+</div>
+
+<div id="confirmModal" class="confirm-modal" hidden>
+  <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle">Excluir aluno?</h2>
+    <p>Esta acao apaga o aluno, acessos, facial e presencas do banco de dados.</p>
+    <div class="confirm-actions">
+      <button type="button" class="button-link secondary" data-confirm-cancel>Cancelar</button>
+      <button type="button" class="btn-danger" data-confirm-ok>Excluir</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const alunoCurso = document.getElementById('alunoCurso')
+  const alunoTurma = document.getElementById('alunoTurma')
+
+  if (alunoCurso && alunoTurma) {
+    const opcoesTurma = Array.from(alunoTurma.options)
+
+    function filtrarTurmasPorCurso(limparTurma = true) {
+      const cursoSelecionado = alunoCurso.value
+
+      if (limparTurma) alunoTurma.value = ''
+      alunoTurma.disabled = !cursoSelecionado
+
+      opcoesTurma.forEach((opcao) => {
+        if (!opcao.value) return
+        const turmaDoCurso = opcao.dataset.curso === cursoSelecionado
+        opcao.hidden = !turmaDoCurso
+        opcao.disabled = !turmaDoCurso
+      })
+    }
+
+    filtrarTurmasPorCurso(false)
+    alunoCurso.addEventListener('change', () => filtrarTurmasPorCurso(true))
+  }
+
+  document.querySelectorAll('.phone-mask').forEach((input) => {
+    function aplicarMascaraTelefone() {
+      const digitos = input.value.replace(/\D/g, '').slice(0, 11)
+      const ddd = digitos.slice(0, 2)
+      const inicio = digitos.length > 10 ? digitos.slice(2, 7) : digitos.slice(2, 6)
+      const fim = digitos.length > 10 ? digitos.slice(7, 11) : digitos.slice(6, 10)
+
+      input.value = ddd ? `(${ddd})${inicio ? ` ${inicio}` : ''}${fim ? `-${fim}` : ''}` : ''
+    }
+
+    aplicarMascaraTelefone()
+    input.addEventListener('input', aplicarMascaraTelefone)
+  })
+
+  const deleteForm = document.getElementById('deleteForm')
+  const confirmModal = document.getElementById('confirmModal')
+
+  if (deleteForm && confirmModal) {
+    deleteForm.addEventListener('submit', (event) => {
+      event.preventDefault()
+      confirmModal.hidden = false
+    })
+
+    confirmModal.querySelector('[data-confirm-cancel]').addEventListener('click', () => {
+      confirmModal.hidden = true
+    })
+
+    confirmModal.querySelector('[data-confirm-ok]').addEventListener('click', () => {
+      deleteForm.submit()
+    })
+  }
+</script>

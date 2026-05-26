@@ -1,0 +1,449 @@
+<div class="admin-dashboard">
+  <section class="admin-hero">
+    <p class="eyebrow">Portal do Admin</p>
+    <h1 class="main-title">Cadastros Academicos</h1>
+    <p>Gerencie os acessos e cadastros principais do ambiente escolar.</p>
+  </section>
+
+  {{#if mensagem}}
+    <div class="notice-alert">{{mensagem}}</div>
+  {{/if}}
+
+  {{#if primeiroAdmin}}
+    <section class="admin-first-access">
+      <form class="admin-form-card" method="POST" action="/admin/administradores">
+        <div class="form-header">
+          <span class="form-icon">AD</span>
+          <div>
+            <p class="eyebrow">Primeiro acesso</p>
+            <h2>Criar administrador</h2>
+          </div>
+        </div>
+
+        <p class="hint-text">Crie seu login de administrador para liberar o painel.</p>
+
+        <div class="form-grid">
+          <div class="input-group">
+            <label>Nome</label>
+            <input type="text" name="nome" placeholder="Digite o nome completo" required>
+          </div>
+
+          <div class="input-group">
+            <label>Usuario</label>
+            <input type="text" name="usuario" placeholder="Ex: admin.secretaria" required>
+          </div>
+
+          <div class="input-group">
+            <label>E-mail</label>
+            <input type="email" name="email" placeholder="admin@escola.com" required>
+          </div>
+
+          <div class="input-group">
+            <label>Senha</label>
+            <input type="password" name="senha" placeholder="Crie uma senha de acesso" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Cadastrar Administrador</button>
+      </form>
+    </section>
+  {{else}}
+    <section class="admin-workspace">
+      <input class="admin-tab-radio" type="radio" name="admin-tab" id="tab-admin" checked>
+      <input class="admin-tab-radio" type="radio" name="admin-tab" id="tab-professor">
+      <input class="admin-tab-radio" type="radio" name="admin-tab" id="tab-curso">
+      <input class="admin-tab-radio" type="radio" name="admin-tab" id="tab-turma">
+      <input class="admin-tab-radio" type="radio" name="admin-tab" id="tab-aluno">
+
+      <aside class="admin-sidebar" aria-label="Categorias de cadastro">
+        <label class="admin-tab" for="tab-admin">
+          <span class="tab-icon">AD</span>
+          <span>Administrador</span>
+        </label>
+        <label class="admin-tab" for="tab-professor">
+          <span class="tab-icon">PR</span>
+          <span>Professor</span>
+        </label>
+        <label class="admin-tab" for="tab-curso">
+          <span class="tab-icon">CR</span>
+          <span>Curso</span>
+        </label>
+        <label class="admin-tab" for="tab-turma">
+          <span class="tab-icon">TM</span>
+          <span>Turma</span>
+        </label>
+        <label class="admin-tab" for="tab-aluno">
+          <span class="tab-icon">AL</span>
+          <span>Aluno</span>
+        </label>
+      </aside>
+
+      <div class="admin-form-stage">
+        <form class="admin-form-card tab-panel panel-admin" method="POST" action="/admin/administradores">
+          <div class="form-header">
+            <span class="form-icon">AD</span>
+            <div>
+              <p class="eyebrow">Acesso administrativo</p>
+              <h2>Novo Administrador</h2>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome</label>
+              <input type="text" name="nome" placeholder="Digite o nome completo" required>
+            </div>
+
+            <div class="input-group">
+              <label>Usuario</label>
+              <input type="text" name="usuario" placeholder="Ex: admin.secretaria" required>
+            </div>
+
+            <div class="input-group">
+              <label>E-mail</label>
+              <input type="email" name="email" placeholder="admin@escola.com" required>
+            </div>
+
+            <div class="input-group">
+              <label>Senha</label>
+              <input type="password" name="senha" placeholder="Crie uma senha de acesso" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Cadastrar Administrador</button>
+        </form>
+
+        <form class="admin-form-card tab-panel panel-professor" method="POST" action="/admin/professores">
+          <div class="form-header">
+            <span class="form-icon">PR</span>
+            <div>
+              <p class="eyebrow">Equipe academica</p>
+              <h2>Novo Professor</h2>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome</label>
+              <input type="text" name="nome" placeholder="Digite o nome completo" required>
+            </div>
+
+            <div class="input-group">
+              <label>E-mail</label>
+              <input type="email" name="email" placeholder="professor@escola.com" required>
+            </div>
+
+            <div class="input-group full-line">
+              <label>Turmas que ministra</label>
+              <div class="choice-list">
+                {{#each turmas}}
+                  <label class="check option-check">
+                    <input type="checkbox" name="turmas" value="{{_id}}">
+                    <span>{{nome}} | {{curso.nome}}</span>
+                  </label>
+                {{else}}
+                  <p class="hint-text">Cadastre turmas antes de vincular um professor.</p>
+                {{/each}}
+              </div>
+            </div>
+
+            <div class="input-group full-line">
+              <p class="hint-text">A matricula sera gerada automaticamente. O login do professor sera o e-mail cadastrado.</p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Cadastrar Professor</button>
+        </form>
+
+        <form class="admin-form-card tab-panel panel-curso" method="POST" action="/admin/cursos">
+          <div class="form-header">
+            <span class="form-icon">CR</span>
+            <div>
+              <p class="eyebrow">Grade academica</p>
+              <h2>Novo Curso</h2>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome do Curso</label>
+              <input type="text" name="nome" placeholder="Ex: Analise e Desenvolvimento de Sistemas" required>
+            </div>
+
+            <div class="input-group">
+              <label>Codigo</label>
+              <input type="text" name="codigo" placeholder="Ex: ADS" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Cadastrar Curso</button>
+        </form>
+
+        <form class="admin-form-card tab-panel panel-turma" method="POST" action="/admin/turmas">
+          <div class="form-header">
+            <span class="form-icon">TM</span>
+            <div>
+              <p class="eyebrow">Organizacao escolar</p>
+              <h2>Nova Turma</h2>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome da Turma</label>
+              <input type="text" name="nome" placeholder="Ex: ADS 1A" required>
+            </div>
+
+            <div class="input-group">
+              <label>Periodo</label>
+              <input type="text" name="periodo" placeholder="Ex: Manha" required>
+            </div>
+
+            <div class="input-group">
+              <label>Curso</label>
+              <select name="curso" required>
+                <option value="" disabled selected>Selecione um curso</option>
+                {{#each cursos}}
+                  <option value="{{_id}}">{{nome}}</option>
+                {{/each}}
+              </select>
+            </div>
+
+            <div class="input-group full-line">
+              <p class="hint-text">O professor sera vinculado depois, no cadastro ou edicao do professor.</p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Cadastrar Turma</button>
+        </form>
+
+        <form class="admin-form-card tab-panel panel-aluno" method="POST" action="/admin/alunos">
+          <div class="form-header">
+            <span class="form-icon">AL</span>
+            <div>
+              <p class="eyebrow">Corpo discente</p>
+              <h2>Novo Aluno</h2>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Nome Completo</label>
+              <input type="text" name="nome" placeholder="Digite o nome do aluno" required>
+            </div>
+
+            <div class="input-group">
+              <label>E-mail</label>
+              <input type="email" name="email" placeholder="aluno@escola.com" required>
+            </div>
+
+            <div class="input-group">
+              <label>Telefone</label>
+              <input class="phone-mask" type="tel" name="telefone" placeholder="(00) 00000-0000" maxlength="15" pattern="^\(\d{2}\)\s\d{4,5}-\d{4}$" inputmode="numeric">
+            </div>
+
+            <div class="input-group">
+              <label>Curso</label>
+              <select name="curso" id="alunoCurso" required>
+                <option value="" disabled selected>Selecione o curso</option>
+                {{#each cursos}}
+                  <option value="{{_id}}">{{nome}}</option>
+                {{/each}}
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Turma</label>
+              <select name="turma" id="alunoTurma" required disabled>
+                <option value="" disabled selected>Selecione a turma</option>
+                {{#each turmas}}
+                  <option value="{{_id}}" data-curso="{{curso._id}}">{{nome}} | {{curso.nome}}</option>
+                {{/each}}
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary">Cadastrar Aluno e Facial</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="admin-records">
+      <article class="admin-record-card" id="lista-alunos">
+        <div class="record-heading">
+          <div>
+            <h2>Alunos Cadastrados</h2>
+            <p>{{alunosPaginacao.inicio}}-{{alunosPaginacao.fim}} de {{alunosPaginacao.total}} cadastros</p>
+          </div>
+          <form class="record-search" method="GET" action="/admin">
+            <input
+              type="search"
+              name="buscaAlunos"
+              value="{{alunosPaginacao.busca}}"
+              placeholder="Buscar por nome, RA, curso ou turma">
+            <button type="submit">Pesquisar</button>
+            {{#if alunosPaginacao.busca}}
+              <a class="button-link secondary" href="/admin">Limpar</a>
+            {{/if}}
+          </form>
+        </div>
+        <div class="table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>RA</th>
+                <th>Nome</th>
+                <th>Curso</th>
+                <th>Turma</th>
+                <th>Facial</th>
+                <th>Acao</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each alunos}}
+                <tr>
+                  <td><span class="badge-ra">{{ra}}</span></td>
+                  <td><strong>{{nome}}</strong></td>
+                  <td>{{curso.nome}}</td>
+                  <td>{{turma.nome}}</td>
+                  <td>
+                    {{#if facialCadastrada}}
+                      <span class="status-tag success">Cadastrada</span>
+                    {{else}}
+                      <span class="status-tag pending">Pendente</span>
+                    {{/if}}
+                  </td>
+                  <td>
+                    <div class="action-group">
+                      <a class="action-link" href="/admin/alunos/{{_id}}/editar">Editar</a>
+                      {{#unless facialCadastrada}}
+                        <a class="action-link" href="/admin/alunos/{{_id}}/facial">Cadastrar Facial</a>
+                      {{/unless}}
+                    </div>
+                  </td>
+                </tr>
+              {{else}}
+                <tr>
+                  <td colspan="6" class="empty-table">Nenhum aluno cadastrado ainda.</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        <nav class="pagination" aria-label="Paginas de alunos">
+          {{#if alunosPaginacao.temAnterior}}
+            <a class="page-link" href="{{alunosPaginacao.anteriorUrl}}">Anterior</a>
+          {{else}}
+            <span class="page-link disabled">Anterior</span>
+          {{/if}}
+
+          {{#each alunosPaginacao.paginas}}
+            {{#if ativa}}
+              <span class="page-link active">{{numero}}</span>
+            {{else}}
+              <a class="page-link" href="{{url}}">{{numero}}</a>
+            {{/if}}
+          {{/each}}
+
+          {{#if alunosPaginacao.temProxima}}
+            <a class="page-link" href="{{alunosPaginacao.proximaUrl}}">Proxima</a>
+          {{else}}
+            <span class="page-link disabled">Proxima</span>
+          {{/if}}
+        </nav>
+      </article>
+
+      <div class="admin-summary-row">
+        <article class="admin-record-card">
+          <h2>Professores</h2>
+          <div class="summary-list">
+            {{#each professores}}
+              <div class="summary-item">
+                <div>
+                  <p class="item-name">{{nome}}</p>
+                  <span class="item-meta">{{matricula}}</span>
+                </div>
+                <a class="action-link" href="/admin/professores/{{_id}}/editar">Editar</a>
+              </div>
+            {{else}}
+              <p class="empty-text">Nenhum professor.</p>
+            {{/each}}
+          </div>
+        </article>
+
+        <article class="admin-record-card">
+          <h2>Cursos</h2>
+          <div class="summary-list">
+            {{#each cursos}}
+              <div class="summary-item">
+                <p class="item-name">{{nome}}</p>
+                <span class="item-meta code">{{codigo}}</span>
+              </div>
+            {{else}}
+              <p class="empty-text">Nenhum curso.</p>
+            {{/each}}
+          </div>
+        </article>
+
+        <article class="admin-record-card">
+          <h2>Turmas</h2>
+          <div class="summary-list">
+            {{#each turmas}}
+              <div class="summary-item">
+                <p class="item-name">{{nome}}</p>
+                <span class="item-meta text">
+                  {{#if professoresLista.length}}
+                    {{#each professoresLista}}{{nome}}{{#unless @last}}, {{/unless}}{{/each}}
+                  {{else}}
+                    Sem professor
+                  {{/if}}
+                </span>
+              </div>
+            {{else}}
+              <p class="empty-text">Nenhuma turma.</p>
+            {{/each}}
+          </div>
+        </article>
+      </div>
+    </section>
+  {{/if}}
+</div>
+
+<script>
+  const alunoCurso = document.getElementById('alunoCurso')
+  const alunoTurma = document.getElementById('alunoTurma')
+
+  if (alunoCurso && alunoTurma) {
+    const opcoesTurma = Array.from(alunoTurma.options)
+
+    function filtrarTurmasPorCurso() {
+      const cursoSelecionado = alunoCurso.value
+
+      alunoTurma.value = ''
+      alunoTurma.disabled = !cursoSelecionado
+
+      opcoesTurma.forEach((opcao) => {
+        if (!opcao.value) return
+        const turmaDoCurso = opcao.dataset.curso === cursoSelecionado
+        opcao.hidden = !turmaDoCurso
+        opcao.disabled = !turmaDoCurso
+      })
+    }
+
+    filtrarTurmasPorCurso()
+    alunoCurso.addEventListener('change', filtrarTurmasPorCurso)
+  }
+
+  document.querySelectorAll('.phone-mask').forEach((input) => {
+    function aplicarMascaraTelefone() {
+      const digitos = input.value.replace(/\D/g, '').slice(0, 11)
+      const ddd = digitos.slice(0, 2)
+      const inicio = digitos.length > 10 ? digitos.slice(2, 7) : digitos.slice(2, 6)
+      const fim = digitos.length > 10 ? digitos.slice(7, 11) : digitos.slice(6, 10)
+
+      input.value = ddd ? `(${ddd})${inicio ? ` ${inicio}` : ''}${fim ? `-${fim}` : ''}` : ''
+    }
+
+    input.addEventListener('input', aplicarMascaraTelefone)
+  })
+</script>
